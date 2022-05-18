@@ -1,0 +1,29 @@
+---
+keywords: ["cheat", "sheet", "cheatsheet"${KW}]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# ${TITLE} Cheats
+
+${DESCRIPTION}
+
+:::info
+This page was automatically generated from a navi cheat file available at [**difranca/navi-cheats**](https://github.com/difranca/navi-cheats).<br />
+**Navi** is an interactive cheatsheet tool for the command-line. To learn more about it, visit [**denisidoro/navi**](https://github.com/denisidoro/navi).
+:::
+
+<Tabs className="unique-tabs">
+<TabItem value="Table Formatted" default>
+${TOPICS}
+
+</TabItem>
+<TabItem value="Navi Cheat">
+
+```
+${NAVI_CHEAT}
+```
+
+</TabItem>
+</Tabs>

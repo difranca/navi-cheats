@@ -1,0 +1,37 @@
+name: Cheat to MD Parser
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Parse cheats to MD
+        run: python .parser/navi2md.py
+
+      - name: Push MD to docs
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.ACTIONS_TOKEN }}
+        with:
+          source-directory: cheats
+          destination-github-username: difranca
+          destination-repository-name: difranca.github.io
+          user-name: github-actions[bot]
+          user-email: 41898282+github-actions[bot]@users.noreply.github.com
+          target-branch: main
+          target-directory: "docs/tech/cheats"
