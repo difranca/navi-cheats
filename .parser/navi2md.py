@@ -77,22 +77,26 @@ def _gen_front_matter(template: str, path: pathlib.Path) -> str:
     path_parts = [part for part in path.parent.parts]
     path_parts.append(path.name.replace('.md', ''))
 
-    keywords = ""
-    slug = ""
+    keywords = ''
+    slug = ''
+    path = ''
     for part in path_parts:
+        if part not in [path_parts[0], path_parts[-1]]:
+            path = f'{part} | ' + path
         part = part.lower()
-        keywords = keywords + f', "{part}"'
+        keywords = keywords + f', {part}'
         slug = slug + f'/{part}'
 
     template = template.replace('${KW}', keywords)
     template = template.replace('${SLUG}', slug)
+    template = template.replace('${PATH}', path)
 
     return template
 
 
-def _gen_title(template: str, title_topic: Topic) -> str:
+def _gen_heading(template: str, title_topic: Topic) -> str:
     template = template.replace(
-        '${TITLE}', title_topic.title.replace('% ', ''))
+        '${NAME}', title_topic.title.replace('% ', ''))
     template = template.replace('${DESCRIPTION}', title_topic.description)
     return template
 
@@ -141,7 +145,7 @@ def gen_content(topic_list: list[Topic], cheat: str, file: str) -> tuple[str, pa
     md_content = _load_md_template()
 
     md_content = _gen_front_matter(md_content, md_path)
-    md_content = _gen_title(md_content, topic_list[0])
+    md_content = _gen_heading(md_content, topic_list[0])
     md_content = _gen_topics(md_content, topic_list)
     md_content = _gen_cheat(md_content, cheat)
 

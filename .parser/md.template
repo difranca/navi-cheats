@@ -1,12 +1,14 @@
 ---
-keywords: ["cheat", "sheet", "cheatsheet"${KW}]
-slug: "${SLUG}"
+keywords: [cheat, sheet, cheatsheet${KW}]
+slug: ${SLUG}
+title: ${NAME} | ${PATH}Cheat Sheets | Tech-Notes
+sidebar_label: ${NAME} Cheats
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# ${TITLE} Cheats
+# ${NAME} Cheats
 
 ${DESCRIPTION}
 
