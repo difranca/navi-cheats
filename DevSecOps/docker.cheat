@@ -1,0 +1,169 @@
+% Docker
+;; Cheat sheet for Docker commands.
+
+$ container: docker ps --format '{{.ID}} {{.Names}} {{.Image}} {{.Status}}' --- --column 1
+$ all_container: docker ps -a --format '{{.ID}} {{.Names}} {{.Image}} {{.Status}}' --- --column 1
+$ image: docker images --format '{{.Repository}}:{{.Tag}}' | grep -v '<none>'
+$ volume: docker volume ls --format '{{.Name}}'
+$ network: docker network ls --format '{{.Name}}'
+
+
+% Docker > Images
+@ Docker
+;; Build and manage images.
+
+# Build an image from a Dockerfile
+docker build -t <tag> .
+
+# Build an image from a specific Dockerfile
+docker build -t <tag> -f <dockerfile> .
+
+# List images
+docker images
+
+# Remove an image
+docker rmi <image>
+
+# Pull an image from a registry
+docker pull <image_name>
+
+# Tag an image
+docker tag <image> <new_tag>
+
+# Remove all dangling images
+docker image prune
+
+
+% Docker > Containers
+@ Docker
+;; Run and manage containers.
+
+# Run a container in detached mode
+docker run -d --name <name> <image>
+
+# Run a container with port mapping
+docker run -d -p <host_port>:<container_port> <image>
+
+# Run a container with volume mount
+docker run -d -v <host_path>:<container_path> <image>
+
+# Run an interactive container with shell
+docker run -it <image> /bin/sh
+
+# List running containers
+docker ps
+
+# List all containers
+docker ps -a
+
+# Stop a running container
+docker stop <container>
+
+# Start a stopped container
+docker start <all_container>
+
+# Restart a container
+docker restart <container>
+
+# Remove a stopped container
+docker rm <all_container>
+
+# Execute a command in a running container
+docker exec -it <container> /bin/sh
+
+# View container logs
+docker logs <container>
+
+# Follow container logs
+docker logs -f <container>
+
+# Show container logs since a time period
+docker logs --since <duration> <container>
+
+# Inspect a container
+docker inspect <container>
+
+# Copy files from container to host
+docker cp <container>:<container_path> <host_path>
+
+# Copy files from host to container
+docker cp <host_path> <container>:<container_path>
+
+
+% Docker > Volumes
+@ Docker
+;; Manage persistent data.
+
+# List volumes
+docker volume ls
+
+# Create a volume
+docker volume create <name>
+
+# Remove a volume
+docker volume rm <volume>
+
+# Remove all unused volumes
+docker volume prune
+
+
+% Docker > Network
+@ Docker
+;; Manage container networking.
+
+# List networks
+docker network ls
+
+# Create a network
+docker network create <name>
+
+# Inspect a network
+docker network inspect <network>
+
+# Connect a container to a network
+docker network connect <network> <container>
+
+# Disconnect a container from a network
+docker network disconnect <network> <container>
+
+
+% Docker > Compose
+;; Manage multi-container applications.
+
+# Start services in detached mode
+docker compose up -d
+
+# Start services with build
+docker compose up -d --build
+
+# Stop services
+docker compose down
+
+# Stop services and remove volumes
+docker compose down -v
+
+# View service logs
+docker compose logs
+
+# Follow service logs
+docker compose logs -f
+
+# List running services
+docker compose ps
+
+# Rebuild a specific service
+docker compose build <service_name>
+
+# Restart a specific service
+docker compose restart <service_name>
+
+
+% Docker > Cleanup
+@ Docker
+;; Free up disk space.
+
+# Remove all stopped containers, unused networks, dangling images, and build cache
+docker system prune
+
+# Show docker disk usage
+docker system df

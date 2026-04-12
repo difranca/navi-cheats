@@ -1,5 +1,6 @@
 import pathlib
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -152,6 +153,38 @@ def gen_content(topic_list: list[Topic], cheat: str, file: str) -> tuple[str, pa
     return md_content, md_path
 
 
+def validate_file(file: str) -> list[str]:
+    errors = []
+
+    with open(file) as f:
+        lines = f.readlines()
+
+    has_topic = False
+    pending_description = False
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+
+        if stripped.startswith('% '):
+            has_topic = True
+        elif stripped.startswith(';; ') and not has_topic:
+            errors.append(f"{file}:{i}: description before any topic header")
+        elif stripped.startswith('# '):
+            pending_description = True
+        elif pending_description:
+            if stripped == '' or stripped.startswith('%') or stripped.startswith('#') or stripped.startswith(';;'):
+                errors.append(f"{file}:{i}: command description without a command")
+            pending_description = False
+
+    if not has_topic:
+        errors.append(f"{file}: no topic header (% ) found")
+
+    if pending_description:
+        errors.append(f"{file}: file ends with a command description but no command")
+
+    return errors
+
+
 def write_md(content: str, path: pathlib.Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, 'w') as md:
@@ -160,11 +193,25 @@ def write_md(content: str, path: pathlib.Path) -> None:
 
 if __name__ == '__main__':
 
+    check_mode = '--check' in sys.argv
+
     cheat_paths = []
     for path in Path().rglob('*.cheat'):
         cheat_paths.append(str(path))
 
-    for path in cheat_paths:
-        topic_list, cheat = parse_file(path)
-        md_content, md_path = gen_content(topic_list, cheat, path)
-        write_md(md_content, md_path)
+    if check_mode:
+        all_errors = []
+        for path in cheat_paths:
+            all_errors.extend(validate_file(path))
+
+        if all_errors:
+            for error in all_errors:
+                print(f"ERROR: {error}", file=sys.stderr)
+            sys.exit(1)
+        else:
+            print(f"All {len(cheat_paths)} cheat file(s) are valid.")
+    else:
+        for path in cheat_paths:
+            topic_list, cheat = parse_file(path)
+            md_content, md_path = gen_content(topic_list, cheat, path)
+            write_md(md_content, md_path)

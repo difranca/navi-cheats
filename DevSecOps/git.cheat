@@ -139,12 +139,17 @@ git push <remote_name> <current_branch>:<branch>
 $ remote_name: git remote | awk '{print $NF}'
 $ remote_branch: git branch -r | awk '{print $NF}'
 $ current_branch: git branch --show-current
-$ destination_branch: 
 
 
 % Git > Rewrite
 @ Git
 ;; Rewrite commits history.
+
+# Amend the last commit with staged changes
+git commit --amend
+
+# Amend the last commit message
+git commit --amend -m <message>
 
 # Apply commits from specified branch ahead of current branch
 git rebase <branch>
@@ -160,6 +165,51 @@ git reset --hard <commit_sha>
 
 # Reset commits going back to a specific commit (keep changes)
 git reset --soft <commit_sha>
+
+
+% Git > Tag
+@ Git
+;; Create and manage tags.
+
+# List tags
+git tag
+
+# Create a lightweight tag
+git tag <tag_name>
+
+# Create an annotated tag
+git tag -a <tag_name> -m <message>
+
+# Create a tag on a specific commit
+git tag -a <tag_name> <commit_sha> -m <message>
+
+# Delete a local tag
+git tag -d <tag>
+
+# Push a tag to remote
+git push origin <tag>
+
+# Push all tags to remote
+git push origin --tags
+
+# Delete a remote tag
+git push origin --delete <tag>
+
+$ tag: git tag | awk '{print $NF}'
+
+
+% Git > Cherry-pick
+@ Git
+;; Apply commits from other branches.
+
+# Apply a commit to the current branch
+git cherry-pick <commit_sha>
+
+# Apply a commit without committing (stage changes only)
+git cherry-pick --no-commit <commit_sha>
+
+# Abort a cherry-pick in progress
+git cherry-pick --abort
 
 
 % Git > Temporary
@@ -182,7 +232,34 @@ git stash drop
 
 
 % Git > GitHub
-;; GitHub useful queries.
+;; Interact with GitHub using gh CLI and quick links.
 
 # See all open pull requests of a user on Github
 navi fn url::open 'https://github.com/pulls?&q=author:<user>+is:open+is:pr'
+
+# List pull requests for current repository
+gh pr list
+
+# Create a pull request for the current branch
+gh pr create
+
+# View a pull request in the terminal
+gh pr view <pr_number>
+
+# Checkout a pull request locally
+gh pr checkout <pr_number>
+
+# List issues for current repository
+gh issue list
+
+# Create a new issue
+gh issue create
+
+# View an issue in the terminal
+gh issue view <issue_number>
+
+# Clone a GitHub repository
+gh repo clone <repository>
+
+# View current repository in browser
+gh browse
