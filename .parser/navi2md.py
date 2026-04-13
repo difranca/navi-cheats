@@ -21,37 +21,36 @@ class Topic:
 def parse_file(file: str) -> tuple[list[Topic], str]:
 
     with open(file) as cheat:
-
         command = None
         topic = None
         topic_list = []
         cheat = cheat.readlines()
 
         for line in cheat:
-
             line = line.strip()
 
-            if line.startswith('% '):
-
+            if line.startswith("% "):
                 if topic:
                     topic_list.append(topic)
 
-                title = re.sub(r'.+\>\s*', '', line)
+                title = re.sub(r".+\>\s*", "", line)
                 topic = Topic(title, [])
 
-            elif line.startswith('# '):
-                command = Command(line.replace('# ', ''))
+            elif line.startswith("# "):
+                command = Command(line.replace("# ", ""))
 
-            elif line.startswith(';; '):
-                topic.description = line.replace(';; ', '')
+            elif line.startswith(";; "):
+                topic.description = line.replace(";; ", "")
 
-            elif len(line) > 0 and line[0] not in ['#', '@', ';', '$']:
-                line = line.replace('<', '{')
-                line = line.replace('>', '}')
+            elif len(line) > 0 and line[0] not in ["#", "@", ";", "$"]:
+                line = line.replace("{", "\\{")
+                line = line.replace("}", "\\}")
+                line = line.replace("<", "\\{")
+                line = line.replace(">", "\\}")
 
-                if line.startswith('navi fn url::open '):
-                    line = line.replace('navi fn url::open ', '')
-                    line = line.replace('\'', '')
+                if line.startswith("navi fn url::open "):
+                    line = line.replace("navi fn url::open ", "")
+                    line = line.replace("'", "")
 
                 command.cmd = line
                 topic.command_list.append(command)
@@ -59,64 +58,61 @@ def parse_file(file: str) -> tuple[list[Topic], str]:
         if topic:
             topic_list.append(topic)
 
-    return topic_list, ''.join(cheat)
+    return topic_list, "".join(cheat)
 
 
 def _load_md_template() -> str:
-    with open('.parser/md.template', 'r') as template:
+    with open(".parser/md.template", "r") as template:
         lines = template.readlines()
-        return ''.join(lines)
+        return "".join(lines)
 
 
 def _load_topic_template() -> str:
-    with open('.parser/topic.template', 'r') as template:
+    with open(".parser/topic.template", "r") as template:
         lines = template.readlines()
-        return ''.join(lines)
+        return "".join(lines)
 
 
 def _gen_front_matter(template: str, path: pathlib.Path) -> str:
     path_parts = [part for part in path.parent.parts]
-    path_parts.append(path.name.replace('.md', ''))
+    path_parts.append(path.name.replace(".md", ""))
 
-    keywords = ''
-    slug = ''
-    path = ''
+    keywords = ""
+    slug = ""
+    path = ""
     for part in path_parts:
         if part not in [path_parts[0], path_parts[-1]]:
-            path = f'{part} | ' + path
+            path = f"{part} | " + path
         part = part.lower()
-        keywords = keywords + f', {part}'
-        slug = slug + f'/{part}'
+        keywords = keywords + f", {part}"
+        slug = slug + f"/{part}"
 
-    template = template.replace('${KW}', keywords)
-    template = template.replace('${SLUG}', slug)
-    template = template.replace('${PATH}', path)
+    template = template.replace("${KW}", keywords)
+    template = template.replace("${SLUG}", slug)
+    template = template.replace("${PATH}", path)
 
     return template
 
 
 def _gen_heading(template: str, title_topic: Topic) -> str:
-    template = template.replace(
-        '${NAME}', title_topic.title.replace('% ', ''))
-    template = template.replace('${DESCRIPTION}', title_topic.description)
+    template = template.replace("${NAME}", title_topic.title.replace("% ", ""))
+    template = template.replace("${DESCRIPTION}", title_topic.description)
     return template
 
 
 def _gen_commands(command_list: list[Command]) -> str:
     commands = [
-        f'|**{command.cmd}**|{command.description}|\n' for command in command_list
+        f"|**{command.cmd}**|{command.description}|\n" for command in command_list
     ]
-    return ''.join(commands)
+    return "".join(commands)
 
 
 def _gen_topic_title(topic: Topic) -> str:
     topic_template = _load_topic_template()
-    topic_template = topic_template.replace('${TITLE}', topic.title)
+    topic_template = topic_template.replace("${TITLE}", topic.title)
+    topic_template = topic_template.replace("${DESCRIPTION}", topic.description)
     topic_template = topic_template.replace(
-        '${DESCRIPTION}', topic.description
-    )
-    topic_template = topic_template.replace(
-        '${COMMANDS}', _gen_commands(topic.command_list)
+        "${COMMANDS}", _gen_commands(topic.command_list)
     )
     return topic_template
 
@@ -125,22 +121,24 @@ def _gen_topics(template: str, topic_list: list[Topic]) -> str:
     topics = ""
 
     if len(topic_list[0].command_list) > 0:
-        topics = topics + _gen_topic_title(Topic('General', '', topic_list[0]))
+        topics = topics + _gen_topic_title(Topic("General", "", topic_list[0]))
 
     if len(topic_list) > 1:
         for topic in topic_list[1:]:
             topics = topics + _gen_topic_title(topic)
 
-    return template.replace('${TOPICS}', topics)
+    return template.replace("${TOPICS}", topics)
 
 
 def _gen_cheat(template: str, cheat: str) -> str:
-    return template.replace('${NAVI_CHEAT}', cheat)
+    return template.replace("${NAVI_CHEAT}", cheat)
 
 
-def gen_content(topic_list: list[Topic], cheat: str, file: str) -> tuple[str, pathlib.Path]:
+def gen_content(
+    topic_list: list[Topic], cheat: str, file: str
+) -> tuple[str, pathlib.Path]:
 
-    md_file = 'cheats/' + file.replace('.cheat', '.md')
+    md_file = "cheats/" + file.replace(".cheat", ".md")
     md_path = pathlib.Path(md_file)
 
     md_content = _load_md_template()
@@ -165,14 +163,19 @@ def validate_file(file: str) -> list[str]:
     for i, line in enumerate(lines, 1):
         stripped = line.strip()
 
-        if stripped.startswith('% '):
+        if stripped.startswith("% "):
             has_topic = True
-        elif stripped.startswith(';; ') and not has_topic:
+        elif stripped.startswith(";; ") and not has_topic:
             errors.append(f"{file}:{i}: description before any topic header")
-        elif stripped.startswith('# '):
+        elif stripped.startswith("# "):
             pending_description = True
         elif pending_description:
-            if stripped == '' or stripped.startswith('%') or stripped.startswith('#') or stripped.startswith(';;'):
+            if (
+                stripped == ""
+                or stripped.startswith("%")
+                or stripped.startswith("#")
+                or stripped.startswith(";;")
+            ):
                 errors.append(f"{file}:{i}: command description without a command")
             pending_description = False
 
@@ -187,16 +190,15 @@ def validate_file(file: str) -> list[str]:
 
 def write_md(content: str, path: pathlib.Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, 'w') as md:
+    with open(path, "w") as md:
         md.write(content)
 
 
-if __name__ == '__main__':
-
-    check_mode = '--check' in sys.argv
+if __name__ == "__main__":
+    check_mode = "--check" in sys.argv
 
     cheat_paths = []
-    for path in Path().rglob('*.cheat'):
+    for path in Path().rglob("*.cheat"):
         cheat_paths.append(str(path))
 
     if check_mode:
